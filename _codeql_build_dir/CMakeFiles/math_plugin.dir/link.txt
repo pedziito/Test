@@ -1,1 +1,0 @@
-/home/runner/work/Test/.codeql-scratch/dbs/cpp/working/autobuild/bin/c++ -fPIC -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/math_plugin.dir/link.d -shared -Wl,-soname,math_plugin.so -o plugins/math_plugin.so CMakeFiles/math_plugin.dir/plugins/math_plugin.cpp.o
