@@ -1,0 +1,10 @@
+name: FiskeSystem
+main: me.pedzito.fiskesystem.Main
+version: 1.0
+author: Adam
+api-version: 1.8
+softdepend: [WorldGuard, WorldEdit]
+commands:
+  fisk:
+    description: Admin kommando til fiske system
+    permission: fiskesystem.admin

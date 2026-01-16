@@ -1,0 +1,9 @@
+/workspaces/Test/build/CMakeFiles/debugger.dir
+/workspaces/Test/build/CMakeFiles/plugin_injector.dir
+/workspaces/Test/build/CMakeFiles/plugin_loader.dir
+/workspaces/Test/build/CMakeFiles/web_server.dir
+/workspaces/Test/build/CMakeFiles/another_plugin.dir
+/workspaces/Test/build/CMakeFiles/example_plugin.dir
+/workspaces/Test/build/CMakeFiles/inject_plugins.dir
+/workspaces/Test/build/CMakeFiles/edit_cache.dir
+/workspaces/Test/build/CMakeFiles/rebuild_cache.dir

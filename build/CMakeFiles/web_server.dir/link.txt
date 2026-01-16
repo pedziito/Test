@@ -1,0 +1,1 @@
+/usr/bin/c++ -O3 -DNDEBUG CMakeFiles/web_server.dir/src/web_server.cpp.o -o web_server  -lpthread 

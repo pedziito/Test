@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -O3 -DNDEBUG -shared -Wl,-soname,another_plugin.so -o plugins_injected/another_plugin.so CMakeFiles/another_plugin.dir/plugins_injected/another_plugin.cpp.o  libdebugger.a /usr/lib/x86_64-linux-gnu/libcurl.so 

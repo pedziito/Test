@@ -1,0 +1,1 @@
+/usr/bin/c++ -O3 -DNDEBUG CMakeFiles/plugin_loader.dir/src/plugin_loader.cpp.o -o plugin_loader  -ldl 
