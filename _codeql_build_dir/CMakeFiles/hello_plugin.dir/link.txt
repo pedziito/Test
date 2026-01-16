@@ -1,0 +1,1 @@
+/home/runner/work/Test/.codeql-scratch/dbs/cpp/working/autobuild/bin/c++ -fPIC -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/hello_plugin.dir/link.d -shared -Wl,-soname,hello_plugin.so -o plugins/hello_plugin.so CMakeFiles/hello_plugin.dir/plugins/hello_plugin.cpp.o

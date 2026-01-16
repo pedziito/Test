@@ -1,0 +1,7 @@
+/home/runner/work/Test/Test/_codeql_build_dir/CMakeFiles/plugin_app.dir
+/home/runner/work/Test/Test/_codeql_build_dir/CMakeFiles/hello_plugin.dir
+/home/runner/work/Test/Test/_codeql_build_dir/CMakeFiles/math_plugin.dir
+/home/runner/work/Test/Test/_codeql_build_dir/CMakeFiles/text_plugin.dir
+/home/runner/work/Test/Test/_codeql_build_dir/CMakeFiles/run.dir
+/home/runner/work/Test/Test/_codeql_build_dir/CMakeFiles/edit_cache.dir
+/home/runner/work/Test/Test/_codeql_build_dir/CMakeFiles/rebuild_cache.dir
