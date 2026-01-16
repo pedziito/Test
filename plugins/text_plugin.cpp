@@ -1,6 +1,7 @@
 #include "../plugin_interface.h"
 #include <iostream>
 #include <string>
+#include <cctype>
 
 // Example plugin that processes text
 class TextPlugin : public IPlugin {
