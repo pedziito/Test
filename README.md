@@ -47,7 +47,21 @@ Dette projekt demonstrerer et plugin-system hvor:
 
 ### Build og Kør
 
-#### Nem måde (med Make):
+#### Nemmeste måde (med build script):
+
+```bash
+# Build og kør direkte
+./build.sh
+
+# Eller brug specifik kommando
+./build.sh build    # Kun build
+./build.sh run      # Build og kør
+./build.sh clean    # Ryd op
+./build.sh rebuild  # Clean og rebuild
+./build.sh help     # Vis hjælp
+```
+
+#### Med Make:
 
 ```bash
 # Build alt
